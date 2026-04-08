@@ -89,9 +89,20 @@ public class Main {
                     service.getAccountDetails(accNumber);
                     break;
                 case 9:
-                    System.out.print("Enter your account number : ");
+                    System.out.println("Please enter the updated account holder details : ");
+                    System.out.print("First name : ");
+                    fname = sc.nextLine();
+                    System.out.print("Last name : ");
+                    lname = sc.nextLine();
+                    System.out.print("email-id : ");
+                    email = sc.nextLine();
+                    System.out.print("Phone number : ");
+                    phoneNumber = sc.nextLine();
+                    System.out.print("Address : ");
+                    address = sc.nextLine();
+                    System.out.print("Account number : ");
                     accNumber = sc.nextLong();
-                    service.updateDetails(accNumber);
+                    service.updateDetails(accNumber,fname, lname, email, phoneNumber, address);
                     break;
                 case 10:
                     System.out.println("Thank you for visiting GG Bank!! \nHave a wonderful day ahead!");

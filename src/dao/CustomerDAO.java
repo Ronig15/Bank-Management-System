@@ -1,6 +1,5 @@
 package dao;
 
-import model.Account;
 import model.Customer;
 import util.DBUtil;
 
@@ -62,4 +61,24 @@ public class CustomerDAO {
     return 0;
     }
 
+    public boolean updateDetails(int customerID, String fname, String lname, String email, String phoneNumber, String address) throws SQLException {
+        String sql = "UPDATE customers SET FirstName=?, LastName=?, Email=?, PhoneNumber=?, Address=? WHERE CustomerID=?";
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+
+            ps.setString(1, fname);
+            ps.setString(2, lname);
+            ps.setString(3, email);
+            ps.setString(4, phoneNumber);
+            ps.setString(5, address);
+            ps.setInt(6, customerID);
+
+            int affectedRows = ps.executeUpdate();
+
+            if (affectedRows == 0) {
+                return false;
+            }
+            return true;
+        }
+    }
 }

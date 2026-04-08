@@ -1,7 +1,6 @@
 package service;
 import java.io.IOException;
 import java.lang.Math;
-import java.lang.Math;
 
 import exceptions.*;
 import model.Account;
@@ -313,4 +312,25 @@ public class BankService {
         }
     }
 
+    public void updateDetails(long accNumber, String fname, String lname, String email, String phoneNumber, String address) {
+        try {
+            Account acc = accountDAO.getAccount(accNumber);
+            if (acc == null) {
+                throw new AccountNotFoundException("Invalid bank account number entered.");
+            }
+
+            if (acc.getStatus().equalsIgnoreCase("closed")) {
+                throw new AccountClosedException("Account already closed.");
+            }
+
+            if(customerDAO.updateDetails(acc.getCustomerID(), fname, lname, email, phoneNumber, address)){
+                System.out.println("Account Holders details Successfully Updated.");
+            } else {
+                System.out.println("Error: Failed to update Account holders details. Update operation unsuccessful.");
+            }
+
+        } catch (SQLException | AccountNotFoundException | AccountClosedException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
 }
