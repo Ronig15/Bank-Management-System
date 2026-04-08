@@ -1,0 +1,8 @@
+================  GG BANK ================
+Transaction Type : Withdrawal
+Transaction ID   : 6
+Account Number   : 1270775534634
+Amount           : ₹ 5000.0
+Date             : 2026-04-08T09:41:15.606483900
+Description      : Withdrawal form Account.
+==========================================
