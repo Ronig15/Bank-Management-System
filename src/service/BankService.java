@@ -290,8 +290,16 @@ public class BankService {
             if (acc.getStatus().equalsIgnoreCase("closed")) {
                 throw new AccountClosedException("Account already closed.");
             }
+
             ArrayList<Account> accDetails = AccountDAO.getAccDetails(accNumber);
-            for (Account a : accDetails) {
+            ArrayList<Customer> CustomerDetails = CustomerDAO.getCustomerDetails(acc.getCustomerID());
+            for( Customer c : CustomerDetails){
+                System.out.println("Name           : "+c.getFirstName()+" "+c.getLastName());
+                System.out.println("Phone Number   : "+c.getPhoneNumber());
+                System.out.println("Address        : "+c.getAddress());
+
+            }
+            for (Account a : accDetails ) {
                 System.out.println("Account Number : " + a.getAccNumber());
                 System.out.println("Customer ID    : " + a.getCustomerID());
                 System.out.println("Type           : " + a.getAccountType());
@@ -300,9 +308,9 @@ public class BankService {
                 System.out.println("Opening Date   : " + a.getOpeningDate());
                 System.out.println("=================================");
             }
-
         } catch (SQLException | AccountNotFoundException | AccountClosedException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }
+
 }

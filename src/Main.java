@@ -88,7 +88,11 @@ public class Main {
                     accNumber = sc.nextLong();
                     service.getAccountDetails(accNumber);
                     break;
-                case 9:break;
+                case 9:
+                    System.out.print("Enter your account number : ");
+                    accNumber = sc.nextLong();
+                    service.updateDetails(accNumber);
+                    break;
                 case 10:
                     System.out.println("Thank you for visiting GG Bank!! \nHave a wonderful day ahead!");
                     System.out.println("=================================================");

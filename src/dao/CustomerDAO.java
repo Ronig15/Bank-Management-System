@@ -1,11 +1,37 @@
 package dao;
 
+import model.Account;
 import model.Customer;
 import util.DBUtil;
 
 import java.sql.*;
+import java.util.ArrayList;
 
 public class CustomerDAO {
+    public static ArrayList<Customer> getCustomerDetails(int customerID) throws SQLException {
+        String sql = "SELECT * FROM customers WHERE CustomerID = ?";
+        ArrayList<Customer> customerDetails = new ArrayList<>();
+        try (Connection conn = DBUtil.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)){
+            ps.setLong(1, customerID);
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    Customer c = new Customer(
+                            rs.getString("FirstName"),
+                            rs.getString("LastName"),
+                            rs.getString("Email"),
+                            rs.getString("PhoneNumber"),
+                            rs.getString("Address"),
+                            rs.getString("PANNumber"),
+                            rs.getLong("AadharNumber")
+                    );
+                    customerDetails.add(c);
+                }
+            }
+        }
+        return customerDetails;
+    }
+
     public int createCustomer(Customer customer) throws SQLException {
         String sql = "INSERT INTO customers (FirstName, LastName, Email, PhoneNumber, Address, PANNumber, AadharNumber) VALUES (?,?,?,?,?,?,?)";
         try(Connection conn = DBUtil.getConnection();
@@ -35,4 +61,5 @@ public class CustomerDAO {
         }
     return 0;
     }
+
 }
