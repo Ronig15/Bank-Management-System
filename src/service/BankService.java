@@ -9,10 +9,13 @@ import model.Customer;
 import dao.*;
 import model.Transaction;
 import receipts.ReceiptGenerator;
+import util.DBUtil;
 
+import java.sql.Connection;
 import java.sql.SQLException;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 
 public class BankService {
     private static CustomerDAO customerDAO = new CustomerDAO();
@@ -170,6 +173,135 @@ public class BankService {
                 }
             }
         }catch (InvalidAmountException | SQLException | AccountNotFoundException | AccountClosedException |IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+
+    public void transfer(long accNumber, long recAccNumber, double amount) {
+        try(Connection conn = DBUtil.getConnection()) {
+            // get senders account
+            Account senderAcc = accountDAO.getAccount(accNumber);
+            if (senderAcc == null) {
+                throw new AccountNotFoundException("Account does not exist at GG Bank.");
+            }
+
+            // bank account already exist. BUT. it's already closed.
+            if (senderAcc.getStatus().equalsIgnoreCase("closed")) {
+                throw new AccountClosedException("Account already closed.");
+            }
+
+            // get receivers account
+            Account receiverAcc = accountDAO.getAccount(recAccNumber);
+            if (receiverAcc == null) {
+                throw new AccountNotFoundException("Account does not exist at GG Bank.");
+            }
+
+            // bank account already exist. BUT. it's already closed.
+            if (receiverAcc.getStatus().equalsIgnoreCase("closed")) {
+                throw new AccountClosedException("Account already closed.");
+            }
+
+            if (senderAcc.getAccNumber() == receiverAcc.getAccNumber()){
+                throw new TransactionBetweenSameAccountException("Cannot transfer to the same account");
+            }
+            // check if specified withdrawal amount is less than the permitted limits.
+            double overdraftLimit = 0;
+            double currentAccountBalance = senderAcc.getBankBalance();
+
+            if (senderAcc.getAccountType().equalsIgnoreCase("current")) {
+                overdraftLimit = -5000;
+            }
+
+            if(currentAccountBalance - amount < overdraftLimit) {
+                throw new InvalidAmountException("Withdrawal amount exceeds the permitted limits.\nCannot initiate transaction.");
+            } else {
+                try {
+                    conn.setAutoCommit(false);
+                    // deduct from senders account, create a transaction
+
+                    // first update the property - balance - in the Account object.
+                    senderAcc.setBankBalance(senderAcc.getBankBalance() - amount);
+
+                    // call AccountDAO object to update the balance field in the DB by using the Account object.
+                    boolean senderAccountUpdateState = accountDAO.transactionUpdateBalance(senderAcc, conn);
+
+                    Transaction t1 = new Transaction(accNumber, "Transfer", amount, LocalDateTime.now(), recAccNumber, "Withdrawal from account for transfer");
+                    transactionDAO.addTransferTransaction(t1, conn);
+
+                    receiverAcc.setBankBalance(receiverAcc.getBankBalance() + amount);
+                    boolean receiverAccountUpdateState = accountDAO.transactionUpdateBalance(receiverAcc, conn);
+                    Transaction t2 = new Transaction(recAccNumber, "Transfer", amount, LocalDateTime.now(), accNumber, "Deposit to account via transfer");
+                    transactionDAO.addTransferTransaction(t2, conn);
+
+
+                    // receipt generation for transactions - t1 and t2
+                    if (senderAccountUpdateState && receiverAccountUpdateState) {
+                        ReceiptGenerator.generateReceipt(t1);
+                        ReceiptGenerator.generateReceipt(t2);
+                        conn.commit();
+                        System.out.println("Transaction successful.\nAvailable balance: " + senderAcc.getBankBalance());
+                    }
+
+                } catch(SQLException e) {
+                    conn.rollback();
+                    System.out.println("Transaction failed: " + e.getMessage());
+                    System.out.println("All operations rolled back.");
+                }
+            }
+        } catch(InvalidAmountException | AccountNotFoundException |TransactionBetweenSameAccountException| AccountClosedException | SQLException | IOException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+
+    }
+
+    public void getTransactionHistory(long accNumber) {
+        try {
+            Account acc = accountDAO.getAccount(accNumber);
+            if (acc == null) {
+                throw new AccountNotFoundException("Invalid bank account number entered.");
+            }
+            if (acc.getStatus().equalsIgnoreCase("closed")) {
+                throw new AccountClosedException("Account already closed.");
+            }
+            ArrayList<Transaction> allTransactions = transactionDAO.getAllTransactions(accNumber);
+            if (allTransactions.isEmpty()) {
+                System.out.println("No transactions performed via this account.");
+            } else {
+                for (Transaction t : allTransactions) {
+                    System.out.println("Transaction date    : " + t.getTimestamp());
+                    System.out.println("Transaction type    : " + t.getTransactionType());
+                    System.out.println("Amount              : " + t.getAmount());
+                    System.out.println("Description         : " + t.getDescription());
+                    System.out.println("=============================================");
+                }
+            }
+        } catch (SQLException | AccountNotFoundException | AccountClosedException e) {
+            System.out.println("Error: " + e.getMessage());
+        }
+    }
+
+    public void getAccountDetails(long accNumber) {
+        try {
+            Account acc = accountDAO.getAccount(accNumber);
+            if (acc == null) {
+                throw new AccountNotFoundException("Invalid bank account number entered.");
+            }
+            if (acc.getStatus().equalsIgnoreCase("closed")) {
+                throw new AccountClosedException("Account already closed.");
+            }
+            ArrayList<Account> accDetails = AccountDAO.getAccDetails(accNumber);
+            for (Account a : accDetails) {
+                System.out.println("Account Number : " + a.getAccNumber());
+                System.out.println("Customer ID    : " + a.getCustomerID());
+                System.out.println("Type           : " + a.getAccountType());
+                System.out.println("Balance        : " + a.getBankBalance());
+                System.out.println("Status         : " + a.getStatus());
+                System.out.println("Opening Date   : " + a.getOpeningDate());
+                System.out.println("=================================");
+            }
+
+        } catch (SQLException | AccountNotFoundException | AccountClosedException e) {
             System.out.println("Error: " + e.getMessage());
         }
     }

@@ -70,10 +70,24 @@ public class Main {
                     service.deposit(accNumber, depositAmount);
                     break;
                 case 6:
+                    System.out.print("Enter your account number : ");
+                    accNumber = sc.nextLong();
+                    System.out.print("Enter receiver's account number : ");
+                    long recAccountNumber = sc.nextLong();
+                    System.out.print("Enter amount : ");
+                    amount = sc.nextDouble();
+                    service.transfer(accNumber, recAccountNumber, amount);
                     break;
                 case 7:
+                    System.out.print("Enter your account number : ");
+                    accNumber = sc.nextLong();
+                    service.getTransactionHistory(accNumber);
                     break;
-                case 8:break;
+                case 8:
+                    System.out.print("Enter your account number : ");
+                    accNumber = sc.nextLong();
+                    service.getAccountDetails(accNumber);
+                    break;
                 case 9:break;
                 case 10:
                     System.out.println("Thank you for visiting GG Bank!! \nHave a wonderful day ahead!");
@@ -82,7 +96,7 @@ public class Main {
                 default:
                     System.out.println("Invalid option selected.\nKindly choose a valid option.");
             }
-        } while(choice != 9);
+        } while(choice != 10);
     }
 }
 

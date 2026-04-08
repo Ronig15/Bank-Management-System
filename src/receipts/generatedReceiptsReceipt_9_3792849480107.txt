@@ -1,0 +1,8 @@
+================  GG BANK ================
+Transaction Type : Deposit
+Transaction ID   : 9
+Account Number   : 3792849480107
+Amount           : ₹ 1.0E7
+Date             : 2026-04-08T15:55:44.879609900
+Description      : Deposit to  account.
+==========================================
