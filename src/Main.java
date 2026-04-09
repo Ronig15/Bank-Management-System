@@ -5,6 +5,7 @@ public class Main {
         Scanner sc = new Scanner(System.in);
         BankService service = new BankService();
         int choice;
+        int typechoice;
         do{
             System.out.println("=================================================");
             System.out.println("\t\t\t\t\tGG Bank");
@@ -40,10 +41,26 @@ public class Main {
                     String address = sc.nextLine();
                     System.out.print("Aadhar number : ");
                     long adharNumber = sc.nextLong();
+                    System.out.println("Choose one of the following options : ");
+                    System.out.println("  1.Current Account ");
+                    System.out.println("  2.Savings Account");
+                    typechoice = sc.nextInt();
                     sc.nextLine();
+                    String accType = "";
+                    switch(typechoice){
+                        case 1:{
+                            accType = "Current";
+                            break;}
+                        case 2:{
+                            accType = "Savings";
+                            break;}
+                        default:{
+                            System.out.println("Enter Valid Account Type");
+                        }
+                    }
                     System.out.print("PAN number : ");
                     String panNumber = sc.nextLine();
-                    service.createAccount(fname, lname, email, phoneNumber, address, adharNumber, panNumber);
+                    service.createAccount(fname, lname, email, phoneNumber, address, adharNumber, panNumber, accType);
                     break;
                 case 2:
                     System.out.print("Enter your Account number : ");

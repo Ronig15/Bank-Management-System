@@ -21,7 +21,7 @@ public class BankService {
     private static AccountDAO accountDAO = new AccountDAO();
     private static TransactionDAO transactionDAO = new TransactionDAO();
 
-    public void createAccount(String fname, String lname, String email, String phoneNumber, String address, long adharNumber, String panNumber) {
+    public void createAccount(String fname, String lname, String email, String phoneNumber, String address, long adharNumber, String panNumber , String accType) {
 
         // first, you have to create a customer object.
         Customer customer = new Customer(fname, lname, email, phoneNumber, address, panNumber, adharNumber);
@@ -36,7 +36,7 @@ public class BankService {
             }
             //Now create the bank account using this customerID
             long accNumber = (long) (Math.random() * 10000000000000L);
-            Account account = new Account(accNumber, customerID, "Savings", 0.0d, "Active", LocalDate.now());
+            Account account = new Account(accNumber, customerID, accType, 0.0d, "Active", LocalDate.now());
             if(accountDAO.createBankAccount(account)){
                 System.out.println("Bank Account Created Successfully. \n Your Account Number is : "+accNumber);
             }else{

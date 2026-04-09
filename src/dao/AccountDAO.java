@@ -51,6 +51,7 @@ public class AccountDAO {
                 }
             }
         }
+
     }
 
     public boolean closeBankAccount(long accNumber) throws SQLException {

@@ -10,6 +10,20 @@ public class Account {
     private String status;
     private LocalDate openingDate;
 
+    public LocalDate getOverdraftStartDate() {
+        return overdraftStartDate;
+    }
+
+    public void setOverdraftStartDate(LocalDate overdraftStartDate) {
+        this.overdraftStartDate = overdraftStartDate;
+    }
+
+    public Account(LocalDate overdraftStartDate) {
+        this.overdraftStartDate = overdraftStartDate;
+    }
+
+    private LocalDate overdraftStartDate;
+
     public Account(long accNumber, int customerID, String accountType, double bankBalance, String status, LocalDate openingDate) {
         this.accNumber = accNumber;
         this.customerID = customerID;
