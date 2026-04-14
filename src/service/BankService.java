@@ -115,6 +115,9 @@ public class BankService {
                 if(acc.getBankBalance() - amount < min_balance) {
                     throw new InsufficientBalanceException("Entered withdrawal amount exceeds the minimum balance rules of bank account.");
                 }
+                if(acc.getStatus().equalsIgnoreCase("SUSPENDED")){
+                    throw new AccountSuspendedException("Account is suspended");
+                }
 
                 // first, set new balance in the account object.
                 acc.setBankBalance(acc.getBankBalance() - amount);
@@ -124,6 +127,14 @@ public class BankService {
                     // if the update is successful, then, create a new record in the transaction table  AND  generate a receipt.
                     Transaction t = new Transaction(acc.getAccNumber(), "Withdrawal", amount,LocalDateTime.now(),0,"Withdrawal form Account.");
                     transactionDAO.addTransaction(t);
+//                    if(acc.getBankBalance() < 0 && acc.getOverdraftStartDate() == null){
+//                        acc.setOverdraftStartDate(LocalDate.now());
+//                        accountDAO.updateOverdraftDate(acc.getAccNumber(), LocalDate.now());
+//                    }
+//                    else if(acc.getBankBalance() >= 0){
+//                        acc.setOverdraftStartDate(null);
+//                        accountDAO.updateOverdraftDate(acc.getAccNumber(), null);
+//                    }
                     // generate a receipt.
                     ReceiptGenerator.generateReceipt(t);
                     System.out.println("Withdrawal successful!");
@@ -136,7 +147,7 @@ public class BankService {
                 }
             }
 
-        } catch(InvalidAmountException | SQLException |IOException| AccountNotFoundException | AccountClosedException | InsufficientBalanceException e) {
+        } catch(InvalidAmountException | SQLException |IOException| AccountNotFoundException |AccountSuspendedException | AccountClosedException | InsufficientBalanceException e) {
             System.out.println("Error: " + e.getMessage());
         }
 
@@ -161,6 +172,10 @@ public class BankService {
                     // if the update is successful, then, create a new record in the transaction table  AND  generate a receipt.
                     Transaction t = new Transaction(acc.getAccNumber(), "Deposit", depositAmount, LocalDateTime.now(), 0, "Deposit to  account.");
                     transactionDAO.addTransaction(t);
+//                    if(acc.getBankBalance() >= 0){
+//                        acc.setOverdraftStartDate(null);
+//                        accountDAO.updateOverdraftDate(acc.getAccNumber(), null);
+//                    }
                     // generate a receipt.
                     ReceiptGenerator.generateReceipt(t);
                     System.out.println("Deposit successful!");
@@ -201,15 +216,14 @@ public class BankService {
                 throw new AccountClosedException("Account already closed.");
             }
 
-            if (senderAcc.getAccNumber() == receiverAcc.getAccNumber()){
-                throw new TransactionBetweenSameAccountException("Cannot transfer to the same account");
-            }
+
+
             // check if specified withdrawal amount is less than the permitted limits.
             double overdraftLimit = 0;
             double currentAccountBalance = senderAcc.getBankBalance();
 
             if (senderAcc.getAccountType().equalsIgnoreCase("current")) {
-                overdraftLimit = -5000;
+                overdraftLimit = -1000;
             }
 
             if(currentAccountBalance - amount < overdraftLimit) {
@@ -248,11 +262,12 @@ public class BankService {
                     System.out.println("All operations rolled back.");
                 }
             }
-        } catch(InvalidAmountException | AccountNotFoundException |TransactionBetweenSameAccountException| AccountClosedException | SQLException | IOException e) {
+        } catch(InvalidAmountException | AccountNotFoundException | AccountClosedException | SQLException | IOException e) {
             System.out.println("Error: " + e.getMessage());
         }
 
     }
+
 
     public void getTransactionHistory(long accNumber) {
         try {

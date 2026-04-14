@@ -1,0 +1,9 @@
+================  GG BANK ================
+Transaction Type : Transfer
+Transaction ID   : 27
+Your account number   : 384380358349
+Receivers account number : 1270775534634
+Amount           : ₹ 10000.0
+Date             : 2026-04-13T21:16:28.869761300
+Description      : Withdrawal from account for transfer
+==========================================

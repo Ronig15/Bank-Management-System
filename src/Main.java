@@ -10,7 +10,7 @@ public class Main {
             System.out.println("=================================================");
             System.out.println("\t\t\t\t\tGG Bank");
             System.out.println("=================================================");
-            System.out.println("Welcome! \n Choose one of the following options :");
+            System.out.println("Welcome!\nChoose one of the following options :");
             System.out.println("1. Create new Bank Account");
             System.out.println("2. Close Account");
             System.out.println("3. Active Closed Account");

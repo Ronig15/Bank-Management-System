@@ -4,6 +4,7 @@ import model.Account;
 import util.DBUtil;
 
 import java.sql.*;
+import java.time.LocalDate;
 import java.util.ArrayList;
 
 public class AccountDAO {
@@ -115,5 +116,22 @@ public class AccountDAO {
         return accDetails;
     }
 
+        public void updateOverdraftDate(long accNumber, LocalDate date) throws SQLException{
+            String sql = "UPDATE BankAccounts SET OverdraftStartDate = ? WHERE AccountNumber = ?";
+            try (Connection conn = DBUtil.getConnection();
+                 PreparedStatement ps = conn.prepareStatement(sql)) {
 
-}
+                if(date != null) {
+                    ps.setDate(1, java.sql.Date.valueOf(date));
+                } else {
+                    ps.setNull(1, java.sql.Types.DATE);
+                }
+                ps.setLong(2, accNumber);
+                int rowsUpdated = ps.executeUpdate();
+                if(rowsUpdated == 0){
+                    System.out.println("No account found with AccountNumber: " + accNumber);
+                }
+
+            }
+        }
+    }
